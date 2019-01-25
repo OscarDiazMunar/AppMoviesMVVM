@@ -17,4 +17,14 @@ public class GetListMovies implements UseCaseListMovies{
     public Observable<ResponseMovies> executeGetPopularMovies(String page) {
         return repository.getListPopularMovie(page);
     }
+
+    @Override
+    public Observable<ResponseMovies> executeGetTopRatingMovies(String page) {
+        return repository.getListTopRatedMovie(page);
+    }
+
+    @Override
+    public Observable<ResponseMovies> executeGetUpcomingMovies(String page) {
+        return repository.getListUpcomingMovie(page);
+    }
 }

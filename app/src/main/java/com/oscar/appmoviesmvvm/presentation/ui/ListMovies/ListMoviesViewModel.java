@@ -14,7 +14,9 @@ import io.reactivex.schedulers.Schedulers;
 public class ListMoviesViewModel extends ViewModel {
     private final GetListMovies getListMovies;
     private final CompositeDisposable disposables = new CompositeDisposable();
-    private final MutableLiveData<ResponseApi> responseApi = new MutableLiveData<>();
+    private final MutableLiveData<ResponseApi> responseApiPopular = new MutableLiveData<>();
+    private final MutableLiveData<ResponseApi> responseApiTopRated = new MutableLiveData<>();
+    private final MutableLiveData<ResponseApi> responseApiUpcoming = new MutableLiveData<>();
 
     public ListMoviesViewModel(GetListMovies getListMovies) {
         this.getListMovies = getListMovies;
@@ -22,25 +24,61 @@ public class ListMoviesViewModel extends ViewModel {
 
     @Override
     protected void onCleared() {
-        super.onCleared();
+        //super.onCleared();
         disposables.clear();
     }
 
-    MutableLiveData<ResponseApi> getResponse(){
-        return responseApi;
+    MutableLiveData<ResponseApi> getResponsePopular(){
+        return responseApiPopular;
+    }
+    MutableLiveData<ResponseApi> getResponseTopRated(){
+        return responseApiTopRated;
+    }
+    MutableLiveData<ResponseApi> getResponseUpcoming(){
+        return responseApiUpcoming;
     }
 
-    public void getMovies(String page){
-        getListMoviesVM(getListMovies, page);
+    public void getMoviesPopular(String page){
+        getListMoviesPopularVM(getListMovies, page);
     }
-    //private
-    private void getListMoviesVM(UseCaseListMovies useCaseListMovies, String page){
+
+    public void getMoviesTopRating(String page){
+        getListMoviesTopRating(getListMovies, page);
+    }
+
+    public void getMoviesUpcoming(String page){
+        getListMoviesUpcoming(getListMovies, page);
+    }
+
+    private void getListMoviesPopularVM(UseCaseListMovies useCaseListMovies, String page){
         disposables.add(useCaseListMovies.executeGetPopularMovies(page)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(__ -> responseApi.setValue(ResponseApi.loading()))
-                .subscribe(result -> responseApi.setValue(ResponseApi.success(result)),
-                        throwable -> responseApi.setValue(ResponseApi.error(throwable))
+                .doOnSubscribe(__ -> responseApiPopular.setValue(ResponseApi.loading()))
+                .subscribe(result -> responseApiPopular.setValue(ResponseApi.success(result)),
+                        throwable -> responseApiPopular.setValue(ResponseApi.error(throwable))
+                )
+        );
+    }
+
+    private void getListMoviesTopRating(UseCaseListMovies useCaseListMovies, String page) {
+        disposables.add(useCaseListMovies.executeGetTopRatingMovies(page)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(__ -> responseApiTopRated.setValue(ResponseApi.loading()))
+                .subscribe(result -> responseApiTopRated.setValue(ResponseApi.success(result)),
+                        throwable -> responseApiTopRated.setValue(ResponseApi.error(throwable))
+                )
+        );
+    }
+
+    private void getListMoviesUpcoming(UseCaseListMovies useCaseListMovies, String page) {
+        disposables.add(useCaseListMovies.executeGetUpcomingMovies(page)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(__ -> responseApiUpcoming.setValue(ResponseApi.loading()))
+                .subscribe(result -> responseApiUpcoming.setValue(ResponseApi.success(result)),
+                        throwable -> responseApiUpcoming.setValue(ResponseApi.error(throwable))
                 )
         );
     }

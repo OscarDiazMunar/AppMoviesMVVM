@@ -146,10 +146,12 @@ public class TabMoviesActivity extends AppCompatActivity {
                 case 0:
                     return ListMoviesFragment.newInstance(0);
                 case 1:
-                    return PlaceholderFragment.newInstance(1);
+                    return ListMoviesFragment.newInstance(1);
+                    //return PlaceholderFragment.newInstance(1);
 
                 case 2:
-                    return PlaceholderFragment.newInstance(2);
+                    return ListMoviesFragment.newInstance(2);
+                    //return PlaceholderFragment.newInstance(2);
             }
             return null;
         }
