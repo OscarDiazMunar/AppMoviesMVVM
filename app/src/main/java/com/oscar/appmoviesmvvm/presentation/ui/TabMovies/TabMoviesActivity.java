@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.oscar.appmoviesmvvm.R;
+import com.oscar.appmoviesmvvm.presentation.ui.ListMovies.ListMoviesFragment;
 
 public class TabMoviesActivity extends AppCompatActivity {
 
@@ -143,14 +144,12 @@ public class TabMoviesActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             switch (position){
                 case 0:
-
-                    break;
+                    return ListMoviesFragment.newInstance(0);
                 case 1:
+                    return PlaceholderFragment.newInstance(1);
 
-                    break;
                 case 2:
-
-                    break;
+                    return PlaceholderFragment.newInstance(2);
             }
             return null;
         }

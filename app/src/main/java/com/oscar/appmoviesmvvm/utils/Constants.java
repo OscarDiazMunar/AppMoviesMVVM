@@ -1,5 +1,7 @@
 package com.oscar.appmoviesmvvm.utils;
 
+import android.support.v4.app.INotificationSideChannel;
+
 /**
  * The type Constants.
  */
@@ -68,5 +70,11 @@ public class Constants {
          * The constant name.
          */
         String name = "movies_user.sqlite";
+    }
+
+    public interface API_STATUS{
+        int LOADING = 0;
+        int SUCCESS = 1;
+        int ERROR = 2;
     }
 }
