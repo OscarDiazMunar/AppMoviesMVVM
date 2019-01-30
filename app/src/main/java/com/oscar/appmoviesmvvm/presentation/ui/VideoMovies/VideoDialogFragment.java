@@ -2,6 +2,7 @@ package com.oscar.appmoviesmvvm.presentation.ui.VideoMovies;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,6 +15,13 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.oscar.appmoviesmvvm.R;
+import com.oscar.appmoviesmvvm.data.rest.MovieDbClient;
+import com.oscar.appmoviesmvvm.domain.model.ResponseApi;
+import com.oscar.appmoviesmvvm.domain.model.ResponseApiVideos;
+import com.oscar.appmoviesmvvm.domain.model.Results;
+import com.oscar.appmoviesmvvm.domain.usecase.ListMovies.GetListMovies;
+import com.oscar.appmoviesmvvm.managers.OnItemClickListener;
+import com.oscar.appmoviesmvvm.presentation.ui.ListMovies.ListMoviesViewModelFactory;
 import com.oscar.appmoviesmvvm.utils.Constants;
 
 public class VideoDialogFragment extends DialogFragment {
@@ -23,6 +31,9 @@ public class VideoDialogFragment extends DialogFragment {
     private WebViewClient webViewClient;
     private WebSettings webSettings;
     private String idMovie;
+
+    private VideoDialogVIewModel videoDialogVIewModel;
+    private ListMoviesViewModelFactory factory;
 
     public VideoDialogFragment() {
         // Required empty public constructor
@@ -52,6 +63,8 @@ public class VideoDialogFragment extends DialogFragment {
             idMovie = getArguments().getString(Constants.ARGS.ID_MOVIE);
         }
         Log.e("IDMOVIE", idMovie);
+        factory = new ListMoviesViewModelFactory(new GetListMovies(MovieDbClient.getInstance()));
+        videoDialogVIewModel = ViewModelProviders.of(getActivity(), factory).get(VideoDialogVIewModel.class);
         return showVideoDialog();
     }
 
@@ -72,9 +85,25 @@ public class VideoDialogFragment extends DialogFragment {
     @Override
     public void onStart() {
         super.onStart();
-
+        videoDialogVIewModel.getResponseVideos().observe(this, responseApiVideos -> proccessResponse(responseApiVideos));
+        videoDialogVIewModel.getVideos(idMovie);
     }
 
+    private void proccessResponse(ResponseApiVideos responseApiVideos) {
+        switch (responseApiVideos.getStatus()) {
+            case Constants.API_STATUS.LOADING:
+
+                break;
+            case Constants.API_STATUS.SUCCESS:
+
+                showVideoFromYoutube(responseApiVideos.responseVideos.getResults().get(0).getKey());
+                //setDataResults(responseApiVideos.responseMovies);
+                break;
+            case Constants.API_STATUS.ERROR:
+                Log.e("Error", responseApiVideos.error.getMessage());
+                break;
+        }
+    }
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -93,13 +122,13 @@ public class VideoDialogFragment extends DialogFragment {
 
     }
 
-    /*@Override
-    public void showVideoFromYoutube(String keyMovie) {
+
+    private void showVideoFromYoutube(String keyMovie) {
         webViewClient = new WebViewClient();
         webSettings = youtubeVideo.getSettings();
         webSettings.setJavaScriptEnabled(true);
         String urlYoutube = Constants.URL.YOUTUBE + keyMovie;
         youtubeVideo.loadUrl(urlYoutube);
         youtubeVideo.setWebViewClient(webViewClient);
-    }*/
+    }
 }

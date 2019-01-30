@@ -2,6 +2,7 @@ package com.oscar.appmoviesmvvm.domain.usecase.ListMovies;
 
 import com.oscar.appmoviesmvvm.data.respositories.RepositoryListMovies;
 import com.oscar.appmoviesmvvm.domain.model.ResponseMovies;
+import com.oscar.appmoviesmvvm.domain.model.Videos;
 
 import io.reactivex.Observable;
 
@@ -26,5 +27,10 @@ public class GetListMovies implements UseCaseListMovies{
     @Override
     public Observable<ResponseMovies> executeGetUpcomingMovies(String page) {
         return repository.getListUpcomingMovie(page);
+    }
+
+    @Override
+    public Observable<Videos> executeGetVideos(String idMovie) {
+        return repository.getVideos(idMovie);
     }
 }

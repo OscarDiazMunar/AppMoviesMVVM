@@ -21,6 +21,7 @@ import com.oscar.appmoviesmvvm.domain.model.Results;
 import com.oscar.appmoviesmvvm.domain.usecase.ListMovies.GetListMovies;
 import com.oscar.appmoviesmvvm.managers.MoviesListAdapter;
 import com.oscar.appmoviesmvvm.managers.OnItemClickListener;
+import com.oscar.appmoviesmvvm.presentation.ui.VideoMovies.VideoDialogFragment;
 import com.oscar.appmoviesmvvm.utils.Constants;
 
 import java.util.ArrayList;
@@ -183,7 +184,8 @@ public class ListMoviesFragment extends Fragment implements OnItemClickListener 
 
     @Override
     public void onItemClick(Results results) {
-
+        VideoDialogFragment videoDialogFragment = VideoDialogFragment.newInstance(results.getId());
+        videoDialogFragment.show(getFragmentManager(), "");
     }
 
     public void setDataResults(ResponseMovies responseMovies) {
