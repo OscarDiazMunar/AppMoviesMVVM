@@ -1,5 +1,8 @@
 package com.oscar.appmoviesmvvm.domain.model;
 
+import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
@@ -242,4 +245,19 @@ public class Results implements Serializable {
                 ", poster_path='" + poster_path + '\'' +
                 '}';
     }
+
+    /**
+     * The constant DIFF_CALLBACK.
+     */
+    public static DiffUtil.ItemCallback<Results> DIFF_CALLBACK = new DiffUtil.ItemCallback<Results>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull Results results, @NonNull Results t1) {
+            return results.id.equals(t1.id);
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull Results results, @NonNull Results t1) {
+            return results.equals(t1);
+        }
+    };
 }

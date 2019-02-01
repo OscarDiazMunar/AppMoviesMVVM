@@ -10,17 +10,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
 
 import com.oscar.appmoviesmvvm.R;
 import com.oscar.appmoviesmvvm.data.rest.MovieDbClient;
 import com.oscar.appmoviesmvvm.domain.model.ResponseApi;
-import com.oscar.appmoviesmvvm.domain.model.ResponseMovies;
 import com.oscar.appmoviesmvvm.domain.model.Results;
 import com.oscar.appmoviesmvvm.domain.usecase.ListMovies.GetListMovies;
-import com.oscar.appmoviesmvvm.managers.MoviesListAdapter;
 import com.oscar.appmoviesmvvm.managers.OnItemClickListener;
+import com.oscar.appmoviesmvvm.managers.adapterPaging.MoviesListPagingAdapter;
 import com.oscar.appmoviesmvvm.presentation.ui.VideoMovies.VideoDialogFragment;
 import com.oscar.appmoviesmvvm.utils.Constants;
 
@@ -29,7 +26,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import butterknife.Unbinder;
 
 /**
@@ -39,28 +35,31 @@ import butterknife.Unbinder;
  * create an instance of this fragment.
  */
 public class ListMoviesFragment extends Fragment implements OnItemClickListener {
+    /**
+     * The Recycler list movies.
+     */
     @BindView(R.id.RecyclerListMovies)
     RecyclerView recyclerListMovies;
-    @BindView(R.id.btnback)
-    Button btnback;
-    @BindView(R.id.page)
-    TextView page;
-    @BindView(R.id.btnnext)
-    Button btnnext;
+    /**
+     * The Unbinder.
+     */
     Unbinder unbinder;
-
-    public MoviesListAdapter moviesListAdapter;
+    /**
+     * The Movies list paging adapter.
+     */
+    public MoviesListPagingAdapter moviesListPagingAdapter;
 
     private Context context;
     private List<Results> resultsListAux = new ArrayList<>();
     private int typeFragment;
-    private int pageCont = 1;
-    private int pageTotal;
 
 
     private ListMoviesViewModel viewModel;
     private ListMoviesViewModelFactory viewModelFactory;
 
+    /**
+     * Instantiates a new List movies fragment.
+     */
     public ListMoviesFragment() {
         // Required empty public constructor
     }
@@ -69,9 +68,10 @@ public class ListMoviesFragment extends Fragment implements OnItemClickListener 
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
+     * @param typeFragment the type fragment
      * @return A new instance of fragment ListMoviesFragment.
      */
-    // TODO: Rename and change types and number of parameters
+// TODO: Rename and change types and number of parameters
     public static ListMoviesFragment newInstance(int typeFragment) {
         ListMoviesFragment fragment = new ListMoviesFragment();
         Bundle args = new Bundle();
@@ -98,9 +98,9 @@ public class ListMoviesFragment extends Fragment implements OnItemClickListener 
         View view = inflater.inflate(R.layout.fragment_list_movies, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        moviesListAdapter = new MoviesListAdapter(resultsListAux, getContext(), this);
+        moviesListPagingAdapter = new MoviesListPagingAdapter(getContext(), this);
         recyclerListMovies.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerListMovies.setAdapter(moviesListAdapter);
+        recyclerListMovies.setAdapter(moviesListPagingAdapter);
         return view;
     }
 
@@ -108,7 +108,7 @@ public class ListMoviesFragment extends Fragment implements OnItemClickListener 
     @Override
     public void onStart() {
         super.onStart();
-        selectTypeFragment(Integer.toString(pageCont));
+        selectTypeFragment();
     }
 
 
@@ -124,22 +124,19 @@ public class ListMoviesFragment extends Fragment implements OnItemClickListener 
 
     }
 
-    private void selectTypeFragment(String page) {
+    private void selectTypeFragment() {
         switch (typeFragment) {
-            case 0:
+            case Constants.TYPE_FRAGMENT.POPULAR:
                 Log.e("TYPEMOVIE", "0");
-                viewModel.getResponsePopular().observe(this, responseApi -> proccessResponse(responseApi));
-                viewModel.getMoviesPopular(page);
+                viewModel.getPagedListResults(Constants.TYPE_FRAGMENT.POPULAR).observe(this, moviesListPagingAdapter::submitList);
                 break;
-            case 1:
+            case Constants.TYPE_FRAGMENT.TOP_RATED:
                 Log.e("TYPEMOVIE", "1");
-                viewModel.getResponseTopRated().observe(this, responseApi -> proccessResponse(responseApi));
-                viewModel.getMoviesTopRating(page);
+                viewModel.getPagedListResults(Constants.TYPE_FRAGMENT.TOP_RATED).observe(this, moviesListPagingAdapter::submitList);
                 break;
-            case 2:
+            case Constants.TYPE_FRAGMENT.UPCOMING:
+                viewModel.getPagedListResults(Constants.TYPE_FRAGMENT.UPCOMING).observe(this, moviesListPagingAdapter::submitList);
                 Log.e("TYPEMOVIE", "2");
-                viewModel.getResponseUpcoming().observe(this, responseApi -> proccessResponse(responseApi));
-                viewModel.getMoviesUpcoming(page);
                 break;
         }
     }
@@ -150,7 +147,7 @@ public class ListMoviesFragment extends Fragment implements OnItemClickListener 
 
                 break;
             case Constants.API_STATUS.SUCCESS:
-                setDataResults(responseApi.responseMovies);
+                Log.e("SUCCES API", "AQUI");
                 break;
             case Constants.API_STATUS.ERROR:
                 Log.e("Error", responseApi.error.getMessage());
@@ -164,39 +161,9 @@ public class ListMoviesFragment extends Fragment implements OnItemClickListener 
         unbinder.unbind();
     }
 
-    @OnClick({R.id.btnback, R.id.btnnext})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.btnback:
-                if (pageCont != 1){
-                    pageCont--;
-                    selectTypeFragment(Integer.toString(pageCont));
-                }
-                break;
-            case R.id.btnnext:
-                if (pageCont < pageTotal){
-                    pageCont++;
-                    selectTypeFragment(Integer.toString(pageCont));
-                }
-                break;
-        }
-    }
-
     @Override
     public void onItemClick(Results results) {
         VideoDialogFragment videoDialogFragment = VideoDialogFragment.newInstance(results.getId());
         videoDialogFragment.show(getFragmentManager(), "");
-    }
-
-    public void setDataResults(ResponseMovies responseMovies) {
-        resultsListAux.clear();
-        List<Results> resultsList = responseMovies.getResults();
-        for (Results item : resultsList) {
-            resultsListAux.add(item);
-        }
-        moviesListAdapter.notifyDataSetChanged();
-        pageTotal = Integer.parseInt(responseMovies.getTotal_pages());
-        String pager = Integer.toString(pageCont) + " de " + responseMovies.getTotal_pages();
-        page.setText(pager);
     }
 }

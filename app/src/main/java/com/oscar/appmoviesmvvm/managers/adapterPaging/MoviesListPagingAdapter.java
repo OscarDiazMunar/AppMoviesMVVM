@@ -1,5 +1,6 @@
-package com.oscar.appmoviesmvvm.managers;
+package com.oscar.appmoviesmvvm.managers.adapterPaging;
 
+import android.arch.paging.PagedListAdapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -9,32 +10,29 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.oscar.appmoviesmvvm.R;
 import com.oscar.appmoviesmvvm.domain.model.Results;
+import com.oscar.appmoviesmvvm.managers.OnItemClickListener;
 import com.oscar.appmoviesmvvm.utils.Constants;
-
-import com.bumptech.glide.Glide;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 import java.util.List;
 
-public class MoviesListAdapter extends RecyclerView.Adapter<MoviesListAdapter.ViewHolder> {
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
+public class MoviesListPagingAdapter extends PagedListAdapter<Results, MoviesListPagingAdapter.ViewHolder> {
     private Context context;
-    private List<Results> resultsList;
     private OnItemClickListener onItemClickListener;
 
     /**
      * Instantiates a new Movies list adapter.
-     *
-     * @param resultsList         the results list
      * @param context             the context
      * @param onItemClickListener the on item click listener
      */
-    public MoviesListAdapter(List<Results> resultsList, Context context, OnItemClickListener onItemClickListener) {
+    public MoviesListPagingAdapter(Context context, OnItemClickListener onItemClickListener) {
+        super(Results.DIFF_CALLBACK);
         this.context = context;
-        this.resultsList = resultsList;
         this.onItemClickListener = onItemClickListener;
     }
 
@@ -44,9 +42,10 @@ public class MoviesListAdapter extends RecyclerView.Adapter<MoviesListAdapter.Vi
         return new ViewHolder(view);
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Results dataMovie = resultsList.get(position);
+        Results dataMovie = getItem(position);
         holder.txtTitleMovie.setText(dataMovie.getOriginal_title());
         holder.txtOverviewMovie.setText(dataMovie.getOverview());
         holder.txtScore.setText(dataMovie.getVote_average());
@@ -54,11 +53,6 @@ public class MoviesListAdapter extends RecyclerView.Adapter<MoviesListAdapter.Vi
         String urlPhoto = Constants.URL.PHOTO + dataMovie.getPoster_path();
         Glide.with(context).load(urlPhoto).into(holder.imgPoster);
         holder.setClickListener(dataMovie, onItemClickListener);
-    }
-
-    @Override
-    public int getItemCount() {
-        return resultsList.size();
     }
 
     /**

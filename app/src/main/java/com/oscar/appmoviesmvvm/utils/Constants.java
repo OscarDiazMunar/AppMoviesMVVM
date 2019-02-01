@@ -72,9 +72,39 @@ public class Constants {
         String name = "movies_user.sqlite";
     }
 
+    /**
+     * The interface Api status.
+     */
     public interface API_STATUS{
+        /**
+         * The constant LOADING.
+         */
         int LOADING = 0;
+        /**
+         * The constant SUCCESS.
+         */
         int SUCCESS = 1;
+        /**
+         * The constant ERROR.
+         */
         int ERROR = 2;
+    }
+
+    /**
+     * The interface Type fragment.
+     */
+    public interface TYPE_FRAGMENT{
+        /**
+         * The constant POPULAR.
+         */
+        int POPULAR = 10;
+        /**
+         * The constant TOP_RATED.
+         */
+        int TOP_RATED = 11;
+        /**
+         * The constant UPCOMING.
+         */
+        int UPCOMING = 12;
     }
 }
