@@ -19,9 +19,6 @@ import io.reactivex.disposables.CompositeDisposable;
 public class ListMoviesViewModel extends ViewModel {
     private final GetListMovies getListMovies;
     private final CompositeDisposable disposables = new CompositeDisposable();
-    private final MutableLiveData<ResponseApi> responseApiPopular = new MutableLiveData<>();
-    private final MutableLiveData<ResponseApi> responseApiTopRated = new MutableLiveData<>();
-    private final MutableLiveData<ResponseApi> responseApiUpcoming = new MutableLiveData<>();
 
     private LiveData<PagedList<Results>> pagedListResults;
     private ResponseMoviesDataSourceFactory dataSourceFactory;
